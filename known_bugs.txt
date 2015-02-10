@@ -1,0 +1,4 @@
+if resource is file upload, then 'dataproxy' button will appear next to 'remove' button
+
+can not change resource type to 'dataproxy' from existing resource
+existing 'dataproxy' resource can be changed to other type
