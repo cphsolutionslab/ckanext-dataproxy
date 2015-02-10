@@ -25,7 +25,7 @@
       {% endif %}
       <input name="url_type" value="dataproxy" type="hidden" {{ form.attributes(disabled) }}/>
       {{ form.select('db', id='field-dataproxy-db', label=_('Database type'), options=[{'value': 'mysql', 'text': 'MySQL'},{'value': 'mssql+pymssql', 'text': 'MsSQL'},{'value': 'postgresql', 'text': 'PostgreSQL'}], selected=data.db, attrs=disabled) }}
-        {{ form.input('port', id='field-dataproxy-port', label=_('Port'), value=data.port, classes=['control-full'], attrs=disabled) }}
+        {{ form.input('port', id='field-dataproxy-port', label=_('Port'), value=data.port | default('3306'), classes=['control-full'], attrs=disabled) }}
         {{ form.input('host', label=_('Host'), id='field-dataproxy-host', placeholder='Hostname or IP adderss', value=data.host, classes=['control-full'], attrs=disabled) }}
         {{ form.input('db_user', id='field-dataproxy-user', label=_('User'), value=data.db_user, classes=['control-full'], attrs=disabled) }}
         {{ form.input('db_password', id='field-dataproxy-password', label=_('Password'), classes=['control-full'], placeholder=password_placeholder, attrs=disabled) }}

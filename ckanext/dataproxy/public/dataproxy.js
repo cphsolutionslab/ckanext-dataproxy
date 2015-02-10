@@ -25,6 +25,9 @@ function formatConnString(){
     var host = $('#field-dataproxy-host').val();
     var user = $('#field-dataproxy-user').val();
     var password = $('#field-dataproxy-password').val();
+    if(password === ''){
+        password = '_password_';
+    }
     var database = $('#field-dataproxy-database').val();
     if(port !== ''){
         port = ':' + port;
