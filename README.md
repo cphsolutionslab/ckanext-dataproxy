@@ -14,7 +14,7 @@ Upon clicking on the DataProxy button, following fields appear:
  - The interface assists by providing default ports for various database types
  - Connection string (URL field) is automatically generated based on entered values
  - Connection string can be modified to pass additional parameters if necessary
- - Password will be encrypted with AES256 cipher and replaced with \_password\_ placeholder
+ - Password will be encrypted with AES256 block cipher and replaced with \_password\_ placeholder
 - - -
 Upon navigating to the resource, recline will automatically render preview:
 ![recline-preview](http://i.imgur.com/OCA4tMf.png)
@@ -31,8 +31,8 @@ Installing
 3) Install the plugin  
 `python setup.py develop`  
 4) Edit ckan settings file e.g /etc/ckan/default/production.ini  
-`#Generate encryption key (Any string will do e.g)`  
-` ckan.dataproxy.secret = c10cef60c144700034657feb6e12304a`  
+`#Password for AES256 key generation (Any string will do e.g)`  
+` ckan.dataproxy.secret = c10cef60c700034657feb6e12304a`  
 5) Enable the plugin, append 'dataproxy' to plugins:  
 `ckan.plugins = stats text_preview ... dataproxy`  
 - - -
