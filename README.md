@@ -23,19 +23,18 @@ The resource is also accessible at api/3/action/datastore_search regardless if d
 Installing
 ------------
 1) Clone this repo  
-
-`cd /usr/lib/ckan/default/src`
-`git clone TODO!`
-`cd ckanext-dataproxy`
- 2) Install requirements (It is not required to install drivers for databases you don't plan to proxy, see the file)
-` pip install -r requirements.txt`
-3) Install the plugin
-`python setup.py develop`
-4) Edit ckan settings file e.g /etc/ckan/default/production.ini
-`#Generate encryption key (Any string will do e.g)`
-` ckan.dataproxy.secret = c10cef60c144700034657feb6e12304a`
-5) Enable the plugin, append 'dataproxy' to plugins:
-`ckan.plugins = stats text_preview ... dataproxy`
+`cd /usr/lib/ckan/default/src`  
+`git clone TODO!`  
+`cd ckanext-dataproxy`  
+ 2) Install requirements (It is not required to install drivers for databases you don't plan to proxy, see the file)  
+` pip install -r requirements.txt`  
+3) Install the plugin  
+`python setup.py develop`  
+4) Edit ckan settings file e.g /etc/ckan/default/production.ini  
+`#Generate encryption key (Any string will do e.g)`  
+` ckan.dataproxy.secret = c10cef60c144700034657feb6e12304a`  
+5) Enable the plugin, append 'dataproxy' to plugins:  
+`ckan.plugins = stats text_preview ... dataproxy`  
 - - -
 Running tests
 ----------------
