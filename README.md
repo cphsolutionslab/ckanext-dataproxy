@@ -22,7 +22,8 @@ The resource is also accessible at api/3/action/datastore_search regardless if d
 - - -
 Installing
 ------------
-1) Clone this repo
+1) Clone this repo  
+
 `cd /usr/lib/ckan/default/src`
 `git clone TODO!`
 `cd ckanext-dataproxy`
@@ -43,4 +44,3 @@ Known bugs
 ----------
 1. if resource is file upload, then 'dataproxy' button will appear next to 'remove' button
 2. can not change resource type to 'dataproxy' from existing resource, however existing 'dataproxy' resource can be changed to other type
-
