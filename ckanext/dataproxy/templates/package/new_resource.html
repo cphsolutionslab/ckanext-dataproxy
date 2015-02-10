@@ -21,6 +21,6 @@
 {% block scripts %}
   {{ super() }}
   {% resource 'vendor/fileupload' %}
-  <script type="text/javascript" src="/dataproxy.js" ></script>
-  <link rel="stylesheet" type="text/css" href="/dataproxy.css">
+  <script type="text/javascript" src="{{ h.url_for_static('/dataproxy.js') }}" ></script>
+  <link rel="stylesheet" type="text/css" href="{{ h.url_for_static('/dataproxy.css') }}">
 {% endblock %}
