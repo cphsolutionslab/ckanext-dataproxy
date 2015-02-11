@@ -28,6 +28,8 @@ Installing
 `cd ckanext-dataproxy`  
  2) Install requirements (It is not required to install drivers for databases you don't plan to proxy, see the file)  
 ` pip install -r requirements.txt`  
+* Additional packages may be required to compile the drivers, for ubuntu:  
+`sudo apt-get install build-essentials libmysqlclient-dev freetds-dev`  
 3) Install the plugin  
 `python setup.py develop`  
 4) Edit ckan settings file e.g /etc/ckan/default/production.ini  
