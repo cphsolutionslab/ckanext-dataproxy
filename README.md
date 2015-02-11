@@ -36,9 +36,10 @@ Installing
 5) Enable the plugin, append 'dataproxy' to plugins:  
 `ckan.plugins = stats text_preview ... dataproxy`  
 - - -
-Running tests
+Tests
 ----------------
-TODO
+TODO: No unit-tests currently
+
 Known bugs
 ----------
 1. if resource is file upload, then 'dataproxy' button will appear next to 'remove' button
