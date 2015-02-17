@@ -5,6 +5,7 @@ ckanext-dataproxy is [CKAN](https://github.com/ckan/ckan) extension that enables
 Usage
 -------
 *Using this module assumes that CKAN server can access the database which is being proxied via resource.*
+
 Create a dataset and navigate to resource adding form:
 ![create-resource](http://i.imgur.com/B7jAl7T.png)
 
