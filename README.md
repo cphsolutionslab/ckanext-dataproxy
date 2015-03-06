@@ -39,7 +39,7 @@ pip install -r requirements.txt
 __Additional packages may be required to compile the database-specific drivers. For Ubuntu, you may need:__
 
 ```
-sudo apt-get install build-essentials libmysqlclient-dev freetds-dev
+sudo apt-get install build-essential libmysqlclient-dev freetds-dev
 ```
 
 3) Install the plugin  
