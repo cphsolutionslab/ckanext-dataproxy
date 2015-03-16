@@ -1,3 +1,11 @@
+# Uncomment if using dataproxy with MySQL database(s)
+# MySQL-python==1.2.5
+
+# Uncomment if using dataproxy with Microsoft SQL Server database(s)
+# pymssql==2.1.1
+
+# The PostgreSQL driver (psycopg2) is already installed with CKAN,
+# so we do not need to require it again.
+
+# Use simple-crypt to encrypt passwords
 -e git+https://github.com/andrewcooke/simple-crypt.git@bb8c85128d4fff0d448e524f8acebb99b777cc38#egg=simple-crypt
-MySQL-python==1.2.5
-pymssql==2.1.1
