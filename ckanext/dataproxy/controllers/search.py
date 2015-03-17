@@ -58,9 +58,6 @@ class SearchController(ApiController):
         table_name = resource.extras['table']
 
         meta = MetaData()
-        #TODO: remove these
-        #engine = create_engine('postgresql://ckan_default:ckan_default@localhost/datastore_default')
-        #engine = create_engine('mssql+pymssql://user:pass@10.0.1.6/Northwind')
         engine = create_engine(connstr)
         table = Table(table_name, meta, autoload=True, autoload_with=engine)
         conn = engine.connect()
