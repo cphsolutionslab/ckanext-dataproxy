@@ -1,0 +1,4 @@
+/*If file upload is not enabled, hide the label, input and anchor*/
+.hide-upload #field-image-upload, .hide-upload label[for*=field-image-upload], .hide-upload #field-image-upload ~ a:first-of-type{
+    display: none !important;
+}
