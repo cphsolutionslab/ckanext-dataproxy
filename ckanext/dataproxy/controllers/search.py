@@ -69,13 +69,16 @@ class SearchController(ApiController):
         
         conn         = engine.connect()
         select_query = select([table])
-        fields       = self._get_fields(table)
+        table_fields = self._get_fields(table)
 
-        limit   = request_data.get('limit',   None)
-        offset  = request_data.get('offset',  None)
-        filters = request_data.get('filters', None)
-        sort    = request_data.get('sort',    None)
-        q       = request_data.get('q',       None) #Not supported
+        filters  = request_data.get('filters',  None)
+        q        = request_data.get('q',        None) # Not yet implemented
+        plain    = request_data.get('plain',    None) # Not yet implemented
+        language = request_data.get('language', None) # Not yet implemented
+        limit    = request_data.get('limit',    None)
+        offset   = request_data.get('offset',   None)
+        fields   = request_data.get('fields',   None) # Not yet implemented
+        sort     = request_data.get('sort',     None)
 
         if limit is not None:
             select_query = select_query.limit(limit)
@@ -94,26 +97,29 @@ class SearchController(ApiController):
             for field, value in filters.iteritems():
                 #check if fields exists
                 select_query = select_query.where(getattr(table.c, field) == value)
-            print select_query
-                
+        # if fields is not None:
+        #     select_query = select_query.with_only_columns( fields.split(',') )
+        #     table_fields = self._get_fields(select_query.columns.items)
+
+
         result = conn.execute(select_query)
 
-        r = list()
+        records = list()
         count = 0
         for row in result:
             count += 1
             d = OrderedDict()
-            for field in fields:
+            for field in table_fields:
                 d[field['id']] = row[field['id']]
-            r.append(d)
+            records.append(d)
         
         retval = OrderedDict()
         retval['help'] = self._help_message()
         retval['success'] = True
         retval['result'] = OrderedDict()
         retval['result']['resource_id'] = request_data['resource_id']
-        retval['result']['fields'] = fields
-        retval['result']['records'] = r
+        retval['result']['fields'] = table_fields
+        retval['result']['records'] = records
         if filters is not None:
             retval['result']['filters'] = filters
         if limit is not None:
