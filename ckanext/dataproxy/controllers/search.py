@@ -49,26 +49,33 @@ class SearchController(ApiController):
         if not secret:
             raise Exception('ckan.dataproxy.secret must be defined to encrypt/decrypt passwords')
 
-        connstr = resource.url
+        table_attr  = resource.extras['table']
+        schema_name = None
+
+        schema_and_table = table_attr.split('.') #=> ['schema', 'table']
+        table_name = schema_and_table.pop() #=> 'table'
+        if (len(schema_and_table) > 0): schema_name = schema_and_table.pop()
+
+        meta = MetaData(schema=schema_name)
+
         password = resource.extras['db_password']
-
         password = decrypt(secret, unhexlify(password))
-
-        connstr = connstr.replace('_password_', password)
-        table_name = resource.extras['table']
-
-        meta = MetaData()
+        
+        connstr  = resource.url
+        connstr  = connstr.replace('_password_', password)
+        
         engine = create_engine(connstr)
-        table = Table(table_name, meta, autoload=True, autoload_with=engine)
-        conn = engine.connect()
+        table  = Table(table_name, meta, autoload=True, autoload_with=engine)
+        
+        conn         = engine.connect()
         select_query = select([table])
-        fields = self._get_fields(table)
+        fields       = self._get_fields(table)
 
-        limit = request_data.get('limit', None)
-        offset = request_data.get('offset', None)
+        limit   = request_data.get('limit',   None)
+        offset  = request_data.get('offset',  None)
         filters = request_data.get('filters', None)
-        sort = request_data.get('sort', None)
-        q = request_data.get('q', None) #Not supported
+        sort    = request_data.get('sort',    None)
+        q       = request_data.get('q',       None) #Not supported
 
         if limit is not None:
             select_query = select_query.limit(limit)
@@ -83,11 +90,14 @@ class SearchController(ApiController):
                 select_query = select_query.order_by(desc(getattr(table.c, sort_column)))
             #else unknown order
         if filters is not None:
+            filters = json.loads(str(filters)) # Convert unicode object to JSON
             for field, value in filters.iteritems():
                 #check if fields exists
                 select_query = select_query.where(getattr(table.c, field) == value)
+            print select_query
                 
         result = conn.execute(select_query)
+
         r = list()
         count = 0
         for row in result:

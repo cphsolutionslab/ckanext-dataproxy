@@ -5,7 +5,12 @@ import ckan.plugins.toolkit as tk
 from ckanext.dataproxy.logic.action.create import dataproxy_resource_create
 from ckanext.dataproxy.logic.action.update import dataproxy_resource_update
 
-if float(__version__) >= 2.3:
+# When __version__ is a patch release like '2.3.1'
+# or worse, '2.3.1b', get the minor point release.
+minor   = '.'.join(__version__.split('.')[0:2]) #=> '2.3'
+version = float(minor)
+
+if version >= 2.3:
     from ckanext.reclineview.plugin import ReclineViewBase
     from ckan.lib.helpers import resource_view_get_fields
 
@@ -48,7 +53,7 @@ class DataProxyPlugin(p.SingletonPlugin):
     p.implements(p.IConfigurer)
     p.implements(p.IRoutes, inherit=True)
     
-    if float(__version__) < 2.3:
+    if version < 2.3:
         #Mask dataproxy resources as datastore ones for recline to render
         p.implements(p.IResourceController, inherit=True)
 
