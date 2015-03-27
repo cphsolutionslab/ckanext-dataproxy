@@ -49,26 +49,41 @@ class SearchController(ApiController):
         if not secret:
             raise Exception('ckan.dataproxy.secret must be defined to encrypt/decrypt passwords')
 
-        connstr = resource.url
+        table_attr  = resource.extras['table']
+        schema_name = None
+
+        schema_and_table = table_attr.split('.') #=> ['schema', 'table']
+        table_name = schema_and_table.pop() #=> 'table'
+        if (len(schema_and_table) > 0): schema_name = schema_and_table.pop()
+
+        meta = MetaData(schema=schema_name)
+
         password = resource.extras['db_password']
-
         password = decrypt(secret, unhexlify(password))
-
-        connstr = connstr.replace('_password_', password)
-        table_name = resource.extras['table']
-
-        meta = MetaData()
+        
+        connstr  = resource.url
+        connstr  = connstr.replace('_password_', password)
+        
         engine = create_engine(connstr)
-        table = Table(table_name, meta, autoload=True, autoload_with=engine)
-        conn = engine.connect()
+        table  = Table(table_name, meta, autoload=True, autoload_with=engine)
+        
+        conn         = engine.connect()
         select_query = select([table])
-        fields = self._get_fields(table)
 
-        limit = request_data.get('limit', None)
-        offset = request_data.get('offset', None)
-        filters = request_data.get('filters', None)
-        sort = request_data.get('sort', None)
-        q = request_data.get('q', None) #Not supported
+        filters  = request_data.get('filters',  None)
+        q        = request_data.get('q',        None) # Not yet implemented
+        plain    = request_data.get('plain',    None) # Not yet implemented
+        language = request_data.get('language', None) # Not yet implemented
+        limit    = request_data.get('limit',    None)
+        offset   = request_data.get('offset',   None)
+        fields   = request_data.get('fields',   None) # Not yet implemented
+        sort     = request_data.get('sort',     None)
+
+        if fields is not None:
+            table_fields = self._get_fields(table, fields=fields.split(','))
+        else:
+            table_fields = self._get_fields(table)
+        
 
         if limit is not None:
             select_query = select_query.limit(limit)
@@ -83,27 +98,33 @@ class SearchController(ApiController):
                 select_query = select_query.order_by(desc(getattr(table.c, sort_column)))
             #else unknown order
         if filters is not None:
+            filters = json.loads(str(filters)) # Convert unicode object to JSON
             for field, value in filters.iteritems():
                 #check if fields exists
                 select_query = select_query.where(getattr(table.c, field) == value)
-                
+        # if fields is not None:
+        #     select_query = select_query.with_only_columns( fields.split(',') )
+        #     table_fields = self._get_fields(select_query.columns.items)
+
+
         result = conn.execute(select_query)
-        r = list()
+
+        records = list()
         count = 0
         for row in result:
             count += 1
             d = OrderedDict()
-            for field in fields:
+            for field in table_fields:
                 d[field['id']] = row[field['id']]
-            r.append(d)
+            records.append(d)
         
         retval = OrderedDict()
         retval['help'] = self._help_message()
         retval['success'] = True
         retval['result'] = OrderedDict()
         retval['result']['resource_id'] = request_data['resource_id']
-        retval['result']['fields'] = fields
-        retval['result']['records'] = r
+        retval['result']['fields'] = table_fields
+        retval['result']['records'] = records
         if filters is not None:
             retval['result']['filters'] = filters
         if limit is not None:
@@ -120,7 +141,7 @@ class SearchController(ApiController):
 
         return json.dumps(retval, default=alchemyencoder)
 
-    def _get_fields(self, table):
+    def _get_fields(self, table, **options):
         """
         Extracts field names and types from SqlAlchemy table object
         Args:
@@ -131,10 +152,22 @@ class SearchController(ApiController):
             This is due to fact that other DB types have different column types/names/sizes. The types
             could be translated to postgresql equivalent however.
         """
-        fields = list()
-        for column in table.columns:
-            fields.append({'id': column.name, 'type': str(column.type)})
-        return fields
+        return_fields   = list()
+        selected_fields = []     # Defaults to empty
+
+        # Get fields if there are any
+        if 'fields' in options: selected_fields = options['fields']
+        fields_exist = len(selected_fields) > 0 # Are there any fields?
+
+        if fields_exist:
+            for column in table.columns:
+                if (column.name in selected_fields):
+                    return_fields.append({'id': column.name, 'type': str(column.type)})
+        else:
+            for column in table.columns:
+                return_fields.append({'id': column.name, 'type': str(column.type)})
+        
+        return return_fields
 
     def _insert_links(self, limit, offset):
         """Copied from ckanext.datastore.db _insert_links() method to decouple from datastore extension"""
