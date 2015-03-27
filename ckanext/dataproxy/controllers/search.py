@@ -79,7 +79,11 @@ class SearchController(ApiController):
         fields   = request_data.get('fields',   None) # Not yet implemented
         sort     = request_data.get('sort',     None)
 
-        table_fields = self._get_fields(table, fields=fields.split(','))
+        if fields is not None:
+            table_fields = self._get_fields(table, fields=fields.split(','))
+        else:
+            table_fields = self._get_fields(table)
+        
 
         if limit is not None:
             select_query = select_query.limit(limit)
