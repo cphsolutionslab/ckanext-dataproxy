@@ -69,7 +69,6 @@ class SearchController(ApiController):
         
         conn         = engine.connect()
         select_query = select([table])
-        table_fields = self._get_fields(table)
 
         filters  = request_data.get('filters',  None)
         q        = request_data.get('q',        None) # Not yet implemented
@@ -79,6 +78,8 @@ class SearchController(ApiController):
         offset   = request_data.get('offset',   None)
         fields   = request_data.get('fields',   None) # Not yet implemented
         sort     = request_data.get('sort',     None)
+
+        table_fields = self._get_fields(table, fields=fields.split(','))
 
         if limit is not None:
             select_query = select_query.limit(limit)
@@ -136,7 +137,7 @@ class SearchController(ApiController):
 
         return json.dumps(retval, default=alchemyencoder)
 
-    def _get_fields(self, table):
+    def _get_fields(self, table, **options):
         """
         Extracts field names and types from SqlAlchemy table object
         Args:
@@ -147,10 +148,22 @@ class SearchController(ApiController):
             This is due to fact that other DB types have different column types/names/sizes. The types
             could be translated to postgresql equivalent however.
         """
-        fields = list()
-        for column in table.columns:
-            fields.append({'id': column.name, 'type': str(column.type)})
-        return fields
+        return_fields   = list()
+        selected_fields = []     # Defaults to empty
+
+        # Get fields if there are any
+        if 'fields' in options: selected_fields = options['fields']
+        fields_exist = len(selected_fields) > 0 # Are there any fields?
+
+        if fields_exist:
+            for column in table.columns:
+                if (column.name in selected_fields):
+                    return_fields.append({'id': column.name, 'type': str(column.type)})
+        else:
+            for column in table.columns:
+                return_fields.append({'id': column.name, 'type': str(column.type)})
+        
+        return return_fields
 
     def _insert_links(self, limit, offset):
         """Copied from ckanext.datastore.db _insert_links() method to decouple from datastore extension"""
