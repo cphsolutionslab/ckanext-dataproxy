@@ -52,16 +52,18 @@ class DataProxyPlugin(p.SingletonPlugin):
     p.implements(p.IActions)
     p.implements(p.IConfigurer)
     p.implements(p.IRoutes, inherit=True)
+    p.implements(p.IResourceController, inherit=True)
     
-    if version < 2.3:
-        #Mask dataproxy resources as datastore ones for recline to render
-        p.implements(p.IResourceController, inherit=True)
-
-        def before_show(self, resource_dict):
-            ''' IResourceController '''
+    def before_show(self, resource_dict):
+        ''' IResourceController '''
+        if 'db_password' in resource_dict:
+            #Remove db_password from display fields (although it's encrypted)
+            resource_dict.pop('db_password')
+        if version < 2.3:
+            #For versions below 2.3 we mask dataproxy resources as datastore ones
             if resource_dict.get('url_type') == 'dataproxy':
                 resource_dict['datastore_active'] = True
-            return resource_dict
+        return resource_dict
     
     def update_config(self, config):
         ''' IConfigurer '''
@@ -81,4 +83,5 @@ class DataProxyPlugin(p.SingletonPlugin):
         #Override API mapping on controller level to intercept dataproxy calls
         search_ctrl = 'ckanext.dataproxy.controllers.search:SearchController'
         map.connect('dataproxy', '/api/3/action/datastore_search', controller=search_ctrl, action='search_action')
+        map.connect('dataproxy', '/api/3/action/datastore_search_sql', controller=search_ctrl, action='search_sql_action')
         return map
