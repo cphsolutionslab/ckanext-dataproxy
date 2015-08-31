@@ -25,6 +25,5 @@ setup(
     entry_points='''
         [ckan.plugins]
         dataproxy=ckanext.dataproxy.plugin:DataProxyPlugin
-        dataproxy_view=ckanext.dataproxy.plugin:DataBaseProxyView
     ''',
 )
