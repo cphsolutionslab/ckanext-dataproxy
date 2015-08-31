@@ -23,7 +23,7 @@ The resource is also accessible at api/3/action/datastore_search regardless if d
 
 Installing
 -------
-__NB! This module is developed on CKAN v2.2.1, compatibility with other version is not ensured__
+__NB! This module is developed on CKAN v2.3, compatibility with other version is not ensured__
 1) Clone this repo  
 
 ```sh
