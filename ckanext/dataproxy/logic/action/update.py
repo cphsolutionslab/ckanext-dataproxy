@@ -1,5 +1,5 @@
+from ckan.logic import get_action
 import pylons.config as config
-from ckan.plugins.toolkit import get_action
 from simplecrypt import encrypt
 from binascii import hexlify
 from ckan.model import Resource
