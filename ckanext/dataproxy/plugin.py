@@ -3,46 +3,55 @@ import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 from ckanext.dataproxy.logic.action.create import dataproxy_resource_create
 from ckanext.dataproxy.logic.action.update import dataproxy_resource_update
-from ckanext.reclineview.plugin import ReclineViewBase
-from ckan.lib.helpers import resource_view_get_fields
 import logging
 
 log = logging.getLogger(__name__)
 
-def resource_view_get_fields_override(resource):
-    #Skip filter fields lookup for dataproxy resources
-    if resource.get('url_type', '') == 'dataproxy':
-        return []
-    return resource_view_get_fields(resource)
 
-class DataBaseProxyView(ReclineViewBase):
-    p.implements(p.ITemplateHelpers)
+DataproxyView = None
+if p.toolkit.check_ckan_version(min_version='2.3.0'):
+    from ckanext.reclineview.plugin import ReclineViewBase
+    from ckan.lib.helpers import resource_view_get_fields
+    class DataproxyView23(ReclineViewBase):
+        p.implements(p.ITemplateHelpers)
 
-    def get_helpers(self):
-        return {'resource_view_get_fields': resource_view_get_fields_override}
+        def _resource_view_get_fields(self, resource):
+            #Skip filter fields lookup for dataproxy resources
+            if resource.get('url_type', '') == 'dataproxy':
+                return []
+            return resource_view_get_fields(resource)
 
-    def info(self):
-        ''' IResourceView '''
-        return {'name': 'database_proxy_view',
-                'title': p.toolkit._('Database Proxy Explorer'),
-                'icon': 'table',
-                'default_title': p.toolkit._('Database Proxy Explorer'),
-                }
+        def get_helpers(self):
+            return {'resource_view_get_fields': self._resource_view_get_fields}
 
-    def can_view(self, data_dict):
-        ''' IResourceView '''
-        resource = data_dict['resource']
-        return resource.get('url_type', '') == 'dataproxy'
+        def info(self):
+            ''' IResourceView '''
+            return {'name': 'database_proxy_view',
+                    'title': p.toolkit._('Database Proxy Explorer'),
+                    'icon': 'table',
+                    'default_title': p.toolkit._('Database Proxy Explorer'),
+                    }
 
-    def setup_template_variables(self, context, data_dict):
-        # we add datastore_active as json value so recline would request datastore api endpoint,
-        # but ckan itself knows it's not datastore therefore ckan won't offer recline views to dataproxy resources
-        data_dict['resource']['datastore_active'] = True
-        return {'resource_json': json.dumps(data_dict['resource']),
-                 'resource_view_json': json.dumps(data_dict['resource_view'])}
+        def can_view(self, data_dict):
+            ''' IResourceView '''
+            resource = data_dict['resource']
+            return resource.get('url_type', '') == 'dataproxy'
+
+        def setup_template_variables(self, context, data_dict):
+            # we add datastore_active as json value so recline would request datastore api endpoint,
+            # but ckan itself knows it's not datastore therefore ckan won't offer recline views to dataproxy resources
+            data_dict['resource']['datastore_active'] = True
+            return {'resource_json': json.dumps(data_dict['resource']),
+                     'resource_view_json': json.dumps(data_dict['resource_view'])}
+    DataproxyView = DataproxyView23
+else:
+    class DataproxyView22(p.SingletonPlugin):
+        '''Views are not supported in CKAN 2.2.x'''
+        pass
+    DataproxyView = DataproxyView22
 
 
-class DataProxyPlugin(p.SingletonPlugin):
+class DataproxyPlugin(p.SingletonPlugin):
     p.implements(p.IActions)
     p.implements(p.IConfigurer)
     p.implements(p.IRoutes, inherit=True)
@@ -55,6 +64,12 @@ class DataProxyPlugin(p.SingletonPlugin):
         tk.add_template_directory(config, 'templates')
         # Add fanstatic folder for serving JS & CSS
         tk.add_resource('fanstatic', 'dataproxy')
+
+    def before_show(self, resource_dict):
+        if not p.toolkit.check_ckan_version(min_version='2.3.0') and resource_dict.get('url_type') == 'dataproxy':
+            #Mask dataproxy resources as datastore ones for recline to render
+            resource_dict['datastore_active'] = True
+        return resource_dict
 
     def get_actions(self):
         ''' IActions '''
