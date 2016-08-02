@@ -2,8 +2,10 @@
 ckanext-dataproxy is [CKAN](https://github.com/ckan/ckan) extension that enables previewing data from remote databases via SQLAlchemy. The extension is compatible with datastore by masking the dataproxy resource as a datastore resource so it could be requested via `/api/3/action/datastore_search` or previewed in-browser with recline-preview.
 
 
-[Usage with CKAN 2.2.x](https://github.com/cphsolutionslab/ckanext-dataproxy/wiki/Usage-with-CKAN-2.2.x)
-[Usage with CKAN 2.5.x](https://github.com/cphsolutionslab/ckanext-dataproxy/wiki/Usage-with-CKAN-2.5.x)
+Usage:
+
+- [CKAN 2.2.x](https://github.com/cphsolutionslab/ckanext-dataproxy/wiki/Usage-with-CKAN-2.2.x)
+- [CKAN 2.5.x](https://github.com/cphsolutionslab/ckanext-dataproxy/wiki/Usage-with-CKAN-2.5.x)
 
 ## Installation 
 __NB! This module is developed for CKAN v2.2.x and v2.5.x, compatibility with other versions is not ensured__
