@@ -78,8 +78,6 @@ class SearchController(ApiController):
         table_name = schema_and_table.pop() #=> 'table'
         if (len(schema_and_table) > 0): schema_name = schema_and_table.pop()
 
-        meta = MetaData(schema=schema_name)
-
         password = resource.extras['db_password']
         password = decrypt(secret, unhexlify(password))
 
@@ -87,7 +85,8 @@ class SearchController(ApiController):
         connstr = connstr.replace('_password_', password)
 
         engine = create_engine(connstr)
-        table  = Table(table_name, meta, autoload=True, autoload_with=engine)
+        meta = MetaData(bind=engine)
+        table = Table(table_name, meta, autoload=True, schema=schema_name)
         table_fields = self._get_fields(table)
 
         conn = engine.connect()
@@ -139,8 +138,6 @@ class SearchController(ApiController):
         table_name = schema_and_table.pop() #=> 'table'
         if (len(schema_and_table) > 0): schema_name = schema_and_table.pop()
 
-        meta = MetaData(schema=schema_name)
-
         password = resource.extras['db_password']
         password = decrypt(secret, unhexlify(password))
 
@@ -148,7 +145,8 @@ class SearchController(ApiController):
         connstr = connstr.replace('_password_', password)
 
         engine = create_engine(connstr)
-        table = Table(table_name, meta, autoload=True, autoload_with=engine)
+        meta = MetaData(bind=engine)
+        table = Table(table_name, meta, autoload=True, schema=schema_name)
 
         conn = engine.connect()
         select_query = select([table])
@@ -201,13 +199,12 @@ class SearchController(ApiController):
                 d[field['id']] = row[field['id']]
             records.append(d)
 
-        # Fetch count of all rows for paging to work (SELECT count(*) seems to be quite universal)
-        sql = text('SELECT count(*) FROM {} LIMIT 1'.format(table_name))
+        # Fetch count of all rows for paging to work
+        sql = select([func.count('*')]).select_from(table)
         result_count = conn.execute(sql)
         count = 0
         for row in result_count:
             count = row[0]
-        
         retval = OrderedDict()
         retval['help'] = self._help_message()
         retval['success'] = True
