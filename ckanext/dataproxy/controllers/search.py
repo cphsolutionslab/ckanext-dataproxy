@@ -34,10 +34,12 @@ class SearchController(ApiController):
         """Routes dataproxy type resources to dataproxy_search method, else performs 'datastore_search' action"""
         #TODO: No access control checks for dataproxy resources!
         request_data = self._get_request_data(try_url_params=True)
-        resource = Resource.get(request_data['resource_id'])
-        if resource is not None and resource.url_type == 'dataproxy':
-            pylons.response.headers['Content-Type'] = 'application/json;charset=utf-8'
-            return self.dataproxy_search(request_data, resource)
+        log.info('{}'.format(request_data))
+        if 'resource_id' in request_data:
+            resource = Resource.get(request_data['resource_id'])
+            if resource is not None and resource.url_type == 'dataproxy':
+                pylons.response.headers['Content-Type'] = 'application/json;charset=utf-8'
+                return self.dataproxy_search(request_data, resource)
 
         #Default action otherwise
         return self.action('datastore_search', ver=3)
