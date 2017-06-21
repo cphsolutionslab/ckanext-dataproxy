@@ -18,7 +18,12 @@ git clone https://github.com/cphsolutionslab/ckanext-dataproxy.git
 cd ckanext-dataproxy
 ```
 
- 2) Install requirements (It is not required to install drivers for databases you don't plan to proxy, see the file)  
+ 2) Activate your virtual environment, e.g.
+```
+. /usr/lib/ckan/bin/activate
+```
+
+ 3) Install requirements (It is not required to install drivers for databases you don't plan to proxy, see the file)  
 ```
 pip install -r requirements.txt
 ```
@@ -29,13 +34,13 @@ __Additional packages may be required to compile the database-specific drivers. 
 sudo apt-get install build-essential libmysqlclient-dev freetds-dev
 ```
 
-3) Install the plugin  
+4) Install the plugin  
 
 ```sh
 python setup.py develop
 ```
 
-4) Set the dataproxy secret in your CKAN settings file (e.g. /etc/ckan/default/production.ini)
+5) Set the dataproxy secret in your CKAN settings file (e.g. /etc/ckan/default/production.ini)
 
 For example, in the settings file:
 
